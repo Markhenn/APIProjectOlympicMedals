@@ -131,18 +131,25 @@ Returns a SQL query string that will find the medals a country has won
 optionally ordered by the given field in the specified direction.
 */
 
+const orderByField = (isAscending, field) => {
+
+  if (!field) {
+    return ' ';
+  }
+
+  if (isAscending) {
+    return `ORDER BY ${field} ASC;`
+  } else {
+    return `ORDER BY ${field} DESC`;
+  }
+
+};
 
 const orderedMedals = (country, field, sortAscending) => {
 
-  if (!field) {
-    return `SELECT * FROM GoldMedal WHERE country = '${country}';`;
-  }
+  const sortString = orderByField(sortAscending, field);
 
-  if (sortAscending) {
-    return `SELECT * FROM GoldMedal WHERE country = '${country}' GROUP BY ${field} ORDER BY ${field} ASC;`;
-  } else {
-    return `SELECT * FROM GoldMedal WHERE country = '${country}' GROUP BY ${field} ORDER BY ${field} DESC;`;
-  }
+  return `SELECT * FROM GoldMedal WHERE country = '${country}' ${sortString};`;
 
 };
 
@@ -155,15 +162,10 @@ aliased as 'percent'. Optionally ordered by the given field in the specified dir
 */
 
 const orderedSports = (country, field, sortAscending) => {
-  if (!field) {
-    return `SELECT sport, COUNT(sport) AS count, 100 * COUNT(*) / (SELECT COUNT(*) FROM GoldMedal  WHERE country ='${country}') AS percent FROM GoldMedal WHERE country ='${country}' GROUP BY 1;`;
-  }
 
-  if (sortAscending) {
-    return `SELECT sport, COUNT(sport), 100 * COUNT(*) / (SELECT COUNT(*) FROM GoldMedal  WHERE country ='${country}') AS percent FROM GoldMedal WHERE country ='${country}' GROUP BY 1 ORDER BY ${field} ASC;`;
-  } else {
-    return `SELECT sport, COUNT(sport) AS count, 100 * COUNT(*) / (SELECT COUNT(*) FROM GoldMedal  WHERE country ='${country}') AS percent FROM GoldMedal WHERE country ='${country}' GROUP BY 1 ORDER BY ${field} DESC;`;
-  }
+  const sortString = orderByField(sortAscending, field);
+
+  return `SELECT sport, COUNT(sport) AS count, 100 * COUNT(*) / (SELECT COUNT(*) FROM GoldMedal  WHERE country ='${country}') AS percent FROM GoldMedal WHERE country ='${country}' GROUP BY sport ${sortString};`;
 
 };
 
