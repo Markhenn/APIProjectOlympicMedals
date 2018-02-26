@@ -103,7 +103,7 @@ Returns a SQL query string that will find the athlete with the most medals.
 */
 
 const mostMedaledAthlete = country => {
-  return `SELECT name, COUNT(*) FROM GoldMedal WHERE country = '${country}' GROUP BY 1 ORDER BY 2 DESC LIMIT 1;`;
+  return `SELECT name FROM GoldMedal WHERE country = '${country}' GROUP BY 1 ORDER BY COUNT(*) DESC LIMIT 1;`;
 };
 
 /*
@@ -135,13 +135,13 @@ aliased as 'percent'. Optionally ordered by the given field in the specified dir
 
 const orderedSports = (country, field, sortAscending) => {
   if (!field) {
-    return `SELECT sport, COUNT(*) AS count FROM GoldMedal WHERE country = '${country}' GROUP BY 1;`;
+    return `SELECT sport, 100 * COUNT(*) / (SELECT COUNT(*) FROM GoldMedal  WHERE country ='${country}') AS percent FROM GoldMedal WHERE country ='${country}' GROUP BY 1;`;
   }
 
   if (sortAscending) {
-    return `SELECT * FROM GoldMedal WHERE country = '${country}' GROUP BY ${field} ORDER BY ${field} ASC;`;
+    return `SELECT sport, 100 * COUNT(*) / (SELECT COUNT(*) FROM GoldMedal  WHERE country ='${country}') AS percent FROM GoldMedal WHERE country ='${country}' GROUP BY 1 ORDER BY ${field} ASC;`;
   } else {
-    return `SELECT * FROM GoldMedal WHERE country = '${country}' GROUP BY ${field} ORDER BY ${field} DESC;`;
+    return `SELECT sport, 100 * COUNT(*) / (SELECT COUNT(*) FROM GoldMedal  WHERE country ='${country}') AS percent FROM GoldMedal WHERE country ='${country}' GROUP BY 1 ORDER BY ${field} DESC;`;
   }
 
 };
